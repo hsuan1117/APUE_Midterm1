@@ -3,12 +3,13 @@
 #include <unistd.h>
 #include <string.h>
 
-#define BSZ 1024
+#define BSZ 32
 
 int main() {
     struct tms t;
     int tics_per_second = sysconf(_SC_CLK_TCK);
-
+    double u_start = (double) t.tms_utime / tics_per_second;
+    double s_start = (double) t.tms_stime / tics_per_second;
     char buf[BSZ];
     memset(buf, 0, BSZ);
 
@@ -22,11 +23,6 @@ int main() {
         fclose(fp2);
     }
 
-    printf("            utime           stime\n");
-    printf("parent:    %f        %f\n",
-           ((double) t.tms_utime) / tics_per_second,
-           ((double) t.tms_stime) / tics_per_second);
-    printf("child:     %f        %f\n",
-           ((double) t.tms_cutime) / tics_per_second,
-           ((double) t.tms_cstime) / tics_per_second);
+    printf("User CPU: %f\n", (double) t.tms_utime / tics_per_second - u_start);
+    printf("System CPU: %f\n", (double) t.tms_stime / tics_per_second - s_start);
 }
